@@ -1,0 +1,49 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from skimage.feature import hog
+from skimage.transform import resize
+from sklearn.datasets import fetch_lfw_people
+
+# Carica il dataset
+lfw_people = fetch_lfw_people(resize=1)
+
+# Ottieni le immagini
+images = lfw_people.images
+
+# Definisci le dimensioni desiderate per il resize
+resize_shape = (128, 64)
+
+# Inizializza una lista per conservare i vettori di feature
+features_list = []
+
+# Itera su tutte le immagini
+for img in images:
+    # Ridimensiona l'immagine
+    img_resized = resize(img, resize_shape)
+    
+    # Estrai le feature HOG
+    fd, hog_image = hog(img_resized, orientations=9, pixels_per_cell=(4, 4), 
+                        cells_per_block=(2, 2), visualize=True, feature_vector=True)
+    
+    # Aggiungi il vettore di feature alla lista
+    features_list.append(fd)
+
+# Converti la lista di feature in una matrice numpy
+features_matrix = np.array(features_list)
+
+# Crea una colonna di etichette (tutti 1 per classe positiva)
+labels = np.ones((features_matrix.shape[0], 1))
+
+# Concatenare le features con le etichette
+final_matrix = np.hstack((features_matrix, labels))
+
+# Verifica la forma della matrice finale
+print(final_matrix.shape)
+
+# Se vuoi convertire la matrice finale in un DataFrame per ulteriori elaborazioni
+df = pd.DataFrame(final_matrix)
+print(df.head())
+
+
+ Generato da ProfAI - https://prof.profession.ai/

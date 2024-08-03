@@ -1,0 +1,83 @@
+Perfetto! Possiamo aggiungere le immagini della classe negativa al tuo dataset esistente. Per fare questo, utilizzeremo `os` per accedere alla directory delle immagini negative, `skimage.io` per caricare le immagini, e `skimage.exposure` per normalizzarle. Procederemo poi a eseguire lo stesso processo di estrazione delle feature HOG e concatenazione delle etichette.
+
+Ecco come puoi fare:
+
+```python
+import os
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from skimage.feature import hog
+from skimage.transform import resize
+from skimage.io import imread
+from skimage.exposure import rescale_intensity
+from sklearn.datasets import fetch_lfw_people
+
+# Carica il dataset
+lfw_people = fetch_lfw_people(resize=1)
+
+# Ottieni le immagini e le normalizzi tra 0 e 1
+images_positive = lfw_people.images
+
+# Definisci le dimensioni desiderate per il resize
+resize_shape = (128, 64)
+
+# Inizializza una lista per conservare i vettori di feature e le etichette
+features_list = []
+labels_list = []
+
+# Funzione per processare un'immagine
+def process_image(img, label):
+    # Ridimensiona l'immagine
+    img_resized = resize(img, resize_shape)
+    
+    # Estrai le feature HOG
+    fd, hog_image = hog(img_resized, orientations=9, pixels_per_cell=(4, 4), 
+                        cells_per_block=(2, 2), visualize=True, feature_vector=True)
+    
+    # Aggiungi il vettore di feature e l'etichetta alle liste
+    features_list.append(fd)
+    labels_list.append(label)
+
+# Processa tutte le immagini positive
+for img in images_positive:
+    process_image(img, 1)
+
+# Path alla directory delle immagini negative
+negative_images_dir = 'path/to/negative/images'
+
+# Processa tutte le immagini negative
+for filename in os.listdir(negative_images_dir):
+    if filename.endswith('.jpg') or filename.endswith('.png'):
+        img_path = os.path.join(negative_images_dir, filename)
+        img = imread(img_path, as_gray=True)
+        
+        # Normalizza l'immagine tra 0 e 1
+        img_normalized = rescale_intensity(img, in_range='image', out_range=(0, 1))
+        
+        process_image(img_normalized, 0)
+
+# Converti le liste in matrici numpy
+features_matrix = np.array(features_list)
+labels_array = np.array(labels_list).reshape(-1, 1)
+
+# Concatenare le features con le etichette
+final_matrix = np.hstack((features_matrix, labels_array))
+
+# Verifica la forma della matrice finale
+print(final_matrix.shape)
+
+# Se vuoi convertire la matrice finale in un DataFrame per ulteriori elaborazioni
+df = pd.DataFrame(final_matrix)
+print(df.head())
+```
+
+### Spiegazione dei nuovi passi
+1. **Normalizzazione delle immagini**: Utilizziamo `rescale_intensity` per normalizzare le immagini tra 0 e 1.
+2. **Caricamento delle immagini negative**: Utilizziamo `os.listdir` per ottenere la lista dei file nella directory delle immagini negative e `imread` per leggere le immagini.
+3. **Processo di feature extraction**: Per ogni immagine negativa, normalizziamo l'immagine, ridimensioniamo, estraiamo le HOG features, e aggiungiamo il vettore di feature e l'etichetta alla lista.
+4. **Concatenazione delle features e delle etichette**: Combiniamo le features e le etichette in una matrice finale.
+
+Assicurati di sostituire `'path/to/negative/images'` con il percorso corretto della directory delle tue immagini negative.
+
+ Generato da ProfAI - https://prof.profession.ai/
