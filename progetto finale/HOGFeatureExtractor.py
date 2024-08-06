@@ -18,11 +18,12 @@ class HOGFeatureExtractor(BaseEstimator, TransformerMixin):
         return self
     
     def transform(self, X, y=None):
-        if X.ndim == 3:  # Caso di una singola immagine
+        if X.ndim == 2:  # Caso di una singola immagine
             return hog(X, pixels_per_cell=self.pixels_per_cell, 
                        cells_per_block=self.cells_per_block, 
                        orientations=self.orientations).reshape(1, -1)
         hog_features = [hog(img, pixels_per_cell=self.pixels_per_cell, 
                             cells_per_block=self.cells_per_block, 
-                            orientations=self.orientations) for img in tqdm(X, desc="HOG feature extraction", unit="item")]
+                            # orientations=self.orientations) for img in tqdm(X, desc="HOG feature extraction", unit="item")]
+                             orientations=self.orientations) for img in X]
         return np.array(hog_features)

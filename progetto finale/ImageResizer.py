@@ -16,5 +16,7 @@ class ImageResizer(BaseEstimator, TransformerMixin):
     
     def transform(self, X, y=None):
         if X.ndim == 2:  # Caso di una singola immagine
-            return resize(X, self.output_shape).reshape(1, *self.output_shape)
-        return np.array([resize(img, self.output_shape) for img in tqdm(X, desc="Resize image", unit="item")])  
+            return resize(X, self.resize_shape).reshape(1, *self.resize_shape)
+        # return np.array([resize(img, self.resize_shape) for img in tqdm(X, desc="Resize image", unit="item")])
+        return np.array([resize(img, self.resize_shape) for img in X])  
+  
