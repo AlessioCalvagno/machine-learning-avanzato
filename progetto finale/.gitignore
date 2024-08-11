@@ -6,3 +6,7 @@ pipe_cache/
 
 
 *.zip
+*.jpg
+*.jpeg
+*.png
+*.joblib
