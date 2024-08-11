@@ -1,0 +1,54 @@
+Per disegnare dei rettangoli su un'immagine utilizzando `matplotlib`, puoi utilizzare la funzione `imshow` per visualizzare l'immagine e la classe `Rectangle` del modulo `patches` per disegnare i rettangoli. Ecco un esempio dettagliato su come farlo:
+
+1. **Carica l'immagine**: Usa `matplotlib` o `PIL` per caricare l'immagine.
+2. **Visualizza l'immagine**: Utilizza `imshow`.
+3. **Disegna i rettangoli**: Utilizza `Rectangle` e aggiungili all'asse corrente.
+
+Ecco un esempio di codice completo:
+
+```python
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+import numpy as np
+from PIL import Image
+
+# Carica l'immagine
+image_path = 'path_to_your_image.jpg'
+image = Image.open(image_path)
+
+# Converti l'immagine in un array numpy se necessario
+image_array = np.array(image)
+
+# Crea una figura e un asse
+fig, ax = plt.subplots(1)
+
+# Mostra l'immagine
+ax.imshow(image_array)
+
+# Definisci le coordinate e le dimensioni dei rettangoli
+# (x, y) è il punto in alto a sinistra del rettangolo
+rectangles = [
+    (50, 50, 100, 150),  # (x, y, width, height)
+    (200, 200, 50, 100)
+]
+
+# Aggiungi i rettangoli all'asse
+for (x, y, width, height) in rectangles:
+    rect = patches.Rectangle((x, y), width, height, linewidth=2, edgecolor='r', facecolor='none')
+    ax.add_patch(rect)
+
+# Mostra il grafico
+plt.show()
+```
+
+### Spiegazione del codice:
+
+1. **Caricamento dell'immagine**: Utilizziamo `PIL` (Pillow) per aprire l'immagine e la convertiamo in un array numpy.
+2. **Visualizzazione dell'immagine**: Creiamo una figura e un asse con `plt.subplots()` e mostriamo l'immagine con `ax.imshow()`.
+3. **Definizione dei rettangoli**: Definiamo una lista di rettangoli, ognuno rappresentato da una tupla contenente le coordinate del punto in alto a sinistra `(x, y)` e le dimensioni `(width, height)`.
+4. **Aggiunta dei rettangoli all'asse**: Iteriamo attraverso la lista dei rettangoli, creando un oggetto `Rectangle` per ciascuno e aggiungendolo all'asse con `ax.add_patch()`.
+5. **Visualizzazione finale**: Utilizziamo `plt.show()` per visualizzare l'immagine con i rettangoli sovrapposti.
+
+Puoi personalizzare l'aspetto dei rettangoli (colore del bordo, spessore, etc.) modificando i parametri di `patches.Rectangle`.
+
+ Generato da ProfAI - https://prof.profession.ai/
