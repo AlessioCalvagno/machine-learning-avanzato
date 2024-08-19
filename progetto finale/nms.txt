@@ -1,0 +1,91 @@
+Certo! Non-Maximum Suppression (NMS) è un algoritmo comunemente utilizzato in ambito di computer vision per filtrare i box di selezione (bounding boxes) in compiti di rilevamento oggetti, inclusa la face detection. L'obiettivo principale di NMS è ridurre le ridondanze eliminando i box che si sovrappongono significativamente e mantenendo solo quelli che rappresentano veramente le facce o gli oggetti rilevati.
+
+### Passaggi dell'algoritmo NMS:
+
+1. **Input**:
+   - Una lista di bounding boxes, ciascuna con una coordinata (x1, y1, x2, y2) che definisce il rettangolo e un punteggio di confidenza (score) che indica quanto il modello è sicuro della presenza di un oggetto in quel box.
+
+2. **Ordinamento**:
+   - Ordina i bounding boxes in base ai loro punteggi di confidenza in ordine decrescente.
+
+3. **Iterazione**:
+   - Inizia con il bounding box con il punteggio più alto.
+   - Aggiungi questo box alla lista dei box finali (che saranno mantenuti).
+   - Confronta questo box con tutti gli altri box rimanenti e calcola l'Intersection over Union (IoU).
+
+4. **Soppressione**:
+   - Se l'IoU tra il box corrente e un altro box è superiore a una soglia predefinita (ad esempio, 0.5), elimina l'altro box dalla lista. Questo passaggio è basato sull'assunzione che un'alta sovrapposizione indica che i box si riferiscono probabilmente allo stesso oggetto.
+   - Ripeti i passaggi 3 e 4 fino a quando non ci sono più box da confrontare.
+
+5. **Output**:
+   - Restituisci la lista dei bounding boxes che sono rimasti dopo la soppressione.
+
+### Pseudocodice dell'algoritmo NMS:
+
+```pseudocode
+Input: 
+    boxes: lista di bounding boxes (x1, y1, x2, y2)
+    scores: lista dei punteggi di confidenza associati ai bounding boxes
+    threshold: soglia IoU per la soppressione
+
+Output: 
+    keep: lista dei box mantenuti
+
+1. Ordina boxes in base a scores in ordine decrescente
+2. Inizializza keep come lista vuota
+3. Mentre boxes non è vuoto:
+    a. Seleziona il box con il punteggio più alto e rimuovilo da boxes
+    b. Aggiungi il box selezionato a keep
+    c. Per ogni box rimanente in boxes:
+        i. Calcola IoU tra il box selezionato e il box corrente
+        ii. Se IoU > threshold, rimuovi il box corrente da boxes
+4. Restituisci keep
+```
+
+### Esempio di Implementazione in Python:
+
+```python
+import numpy as np
+
+def non_max_suppression(boxes, scores, threshold):
+    # Converti le liste in array numpy per una manipolazione più semplice
+    boxes = np.array(boxes)
+    scores = np.array(scores)
+    
+    # Ordina i box in base ai punteggi in ordine decrescente
+    indices = np.argsort(scores)[::-1]
+    boxes = boxes[indices]
+    
+    keep = []
+    
+    while len(boxes) > 0:
+        # Prendi il box con il punteggio più alto
+        current_box = boxes[0]
+        keep.append(current_box)
+        
+        # Calcola l'IoU tra il box corrente e tutti gli altri box
+        other_boxes = boxes[1:]
+        iou = compute_iou(current_box, other_boxes)
+        
+        # Mantieni solo i box con IoU inferiore alla soglia
+        boxes = other_boxes[iou < threshold]
+    
+    return keep
+
+def compute_iou(box, other_boxes):
+    x1 = np.maximum(box[0], other_boxes[:, 0])
+    y1 = np.maximum(box[1], other_boxes[:, 1])
+    x2 = np.minimum(box[2], other_boxes[:, 2])
+    y2 = np.minimum(box[3], other_boxes[:, 3])
+    
+    inter_area = np.maximum(0, x2 - x1 + 1) * np.maximum(0, y2 - y1 + 1)
+    box_area = (box[2] - box[0] + 1) * (box[3] - box[1] + 1)
+    other_areas = (other_boxes[:, 2] - other_boxes[:, 0] + 1) * (other_boxes[:, 3] - other_boxes[:, 1] + 1)
+    
+    iou = inter_area / (box_area + other_areas - inter_area)
+    return iou
+```
+
+In questo esempio, `compute_iou` calcola l'Intersection over Union tra un bounding box e una lista di altri bounding boxes, il che è essenziale per la fase di soppressione dell'NMS. L'implementazione di `non_max_suppression` utilizza questa funzione per filtrare i box ridondanti.
+
+ Generato da ProfAI - https://prof.profession.ai/
