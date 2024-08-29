@@ -1,7 +1,6 @@
 import numpy as np
 from skimage.transform import resize
 from sklearn.base import BaseEstimator, TransformerMixin
-from tqdm import tqdm
 
 class ImageResizer(BaseEstimator, TransformerMixin):
     """
@@ -34,14 +33,13 @@ class ImageResizer(BaseEstimator, TransformerMixin):
         Parameters:
         - X: (M,N) ndarray or (K,M,N) ndarray.
             If X is a 2d array, it's a single grayscale image;
-            If X is a 3 array, it's an array of K grayscale images.
+            If X is a 3d array, it's an array of K grayscale images.
         - y: ignored, included only for compatibility reasons.
 
         Return:
         resized image as ndarray (2d if X is a single image or 3d if X is an array of images). 
         """
-        if X.ndim == 2:  # Caso di una singola immagine
+        if X.ndim == 2:  # Single image case
             return resize(X, self.resize_shape).reshape(1, *self.resize_shape)
-        # return np.array([resize(img, self.resize_shape) for img in tqdm(X, desc="Resize image", unit="item")])
         return np.array([resize(img, self.resize_shape) for img in X])  
   

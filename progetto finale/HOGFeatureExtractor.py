@@ -1,7 +1,6 @@
 import numpy as np
 from skimage.feature import hog
 from sklearn.base import BaseEstimator, TransformerMixin
-from tqdm import tqdm
 
 
 class HOGFeatureExtractor(BaseEstimator, TransformerMixin):
@@ -56,6 +55,5 @@ class HOGFeatureExtractor(BaseEstimator, TransformerMixin):
                        orientations=self.orientations).reshape(1, -1)
         hog_features = [hog(img, pixels_per_cell=self.pixels_per_cell, 
                             cells_per_block=self.cells_per_block, 
-                            # orientations=self.orientations) for img in tqdm(X, desc="HOG feature extraction", unit="item")]
                              orientations=self.orientations) for img in X]
         return np.array(hog_features)
